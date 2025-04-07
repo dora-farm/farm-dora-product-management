@@ -1,4 +1,6 @@
 package com.farmdora.farmdoraproductmanagement.service;
+import com.farmdora.farmdoraproductmanagement.dto.OptionDto;
+import com.farmdora.farmdoraproductmanagement.dto.SaleFileDto;
 import com.farmdora.farmdoraproductmanagement.dto.SaleRequestDto;
 import com.farmdora.farmdoraproductmanagement.entity.*;
 import com.farmdora.farmdoraproductmanagement.repository.*;
@@ -46,7 +48,7 @@ public class SaleService {
 
         // 3. SaleFile 엔티티들 생성 및 저장
         if (requestDto.getFiles() != null) {
-            for (SaleRequestDto.SaleFileDto fileDto : requestDto.getFiles()) {
+            for (SaleFileDto fileDto : requestDto.getFiles()) {
                 SaleFile saleFile = SaleFile.builder()
                         .sale(savedSale)
                         .saveFile(fileDto.getSaveFile())
@@ -60,7 +62,7 @@ public class SaleService {
 
         // 4. Option 엔티티들 생성 및 저장
         if (requestDto.getOptions() != null) {
-            for (SaleRequestDto.OptionDto optionDto : requestDto.getOptions()) {
+            for (OptionDto optionDto : requestDto.getOptions()) {
                 // OptionType 조회
                 OptionType optionType = optionTypeRepository.findById(optionDto.getTypeId())
                         .orElseThrow(() -> new RuntimeException("옵션 타입을 찾을 수 없습니다."));

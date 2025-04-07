@@ -1,12 +1,12 @@
 package com.farmdora.farmdoraproductmanagement.common.response;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.http.HttpStatus;
 
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 public class HttpResponse {
     private int status;

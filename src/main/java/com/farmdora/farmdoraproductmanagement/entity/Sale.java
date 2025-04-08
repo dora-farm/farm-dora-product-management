@@ -34,7 +34,7 @@ public class Sale extends BaseTimeEntity {
     @Column(length = 50)
     private String title;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "LONGTEXT")
     private String content;
 
     @Column(length = 50)

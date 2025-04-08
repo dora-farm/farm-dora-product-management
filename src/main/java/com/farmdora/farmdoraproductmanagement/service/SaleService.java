@@ -64,7 +64,7 @@ public class SaleService {
         if (requestDto.getOptions() != null) {
             for (OptionDto optionDto : requestDto.getOptions()) {
                 // OptionType 조회
-                OptionType optionType = optionTypeRepository.findById(optionDto.getTypeId())
+                OptionType optionType = optionTypeRepository.findById(requestDto.getTypeId())
                         .orElseThrow(() -> new RuntimeException("옵션 타입을 찾을 수 없습니다."));
 
                 Options option = Options.builder()

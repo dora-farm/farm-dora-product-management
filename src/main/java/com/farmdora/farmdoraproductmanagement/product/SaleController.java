@@ -6,10 +6,7 @@ import com.farmdora.farmdoraproductmanagement.dto.SaleRequestDto;
 import com.farmdora.farmdoraproductmanagement.service.SaleService;
 import com.farmdora.farmdoraproductmanagement.service.StorageService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -18,7 +15,8 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/my/seller/product")
+@CrossOrigin(origins = "http://localhost:5173") // 프론트와 테스트용 임시 추가
+@RequestMapping("/my/seller")
 public class SaleController {
 
     private final SaleService saleService;
@@ -29,11 +27,12 @@ public class SaleController {
         this.storageService = storageService;
     }
 
-    @PostMapping(value="add")
+    @PostMapping("additem")
     public HttpResponse addProduct(
             @RequestPart("productData") String productDataStr,
             @RequestPart("files") List<MultipartFile> files) throws IOException {
 
+        System.out.println(productDataStr);
         // JSON 문자열을 DTO 객체로 직접 변환
         SaleRequestDto requestDto =
                 new ObjectMapper().readValue(productDataStr, SaleRequestDto.class);
@@ -53,11 +52,11 @@ public class SaleController {
             attachedFile.setOriginFile(part.getOriginalFilename());
             attachedFile.setMain(isFirstFile); // 첫 번째 파일만 false, 나머지는 true
             isFirstFile = true; // 플래그를 true로 변경하여 이후 파일은 모두 isMain=true(1)가 되도록 함
-
             fileList.add(attachedFile);
         }
 
         requestDto.setFiles(fileList);
+
 
         Integer saleId = saleService.createSale(requestDto);
 

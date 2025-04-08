@@ -15,6 +15,7 @@ public class SaleRequestDto {
     private String title;
     private String content;
     private String origin;
+    private Integer typeId;  // OptionType의 ID
     private List<SaleFileDto> files;
     private List<OptionDto> options;
 }

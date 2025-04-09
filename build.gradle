@@ -18,6 +18,9 @@ repositories {
 }
 
 dependencies {
+    //object storage 사용을 위한 라이브러리
+    implementation 'com.amazonaws:aws-java-sdk-s3:1.12.782'
+
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 

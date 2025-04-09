@@ -21,7 +21,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class Option {
+public class Options {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

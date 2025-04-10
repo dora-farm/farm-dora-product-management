@@ -1,4 +1,5 @@
 package com.farmdora.farmdoraproductmanagement.service;
+
 import com.farmdora.farmdoraproductmanagement.dto.OptionDto;
 import com.farmdora.farmdoraproductmanagement.dto.SaleFileDto;
 import com.farmdora.farmdoraproductmanagement.dto.SaleRequestDto;
@@ -6,6 +7,8 @@ import com.farmdora.farmdoraproductmanagement.entity.*;
 import com.farmdora.farmdoraproductmanagement.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @Transactional
@@ -17,17 +20,21 @@ public class SaleService {
     private final SellerRepository sellerRepository;
     private final OptionTypeRepository optionTypeRepository;
 
+    private final StorageService storageService;
+
     // 생성자 주입
     public SaleService(SaleRepository saleRepository,
                        SaleFileRepository saleFileRepository,
                        OptionRepository optionRepository,
                        SellerRepository sellerRepository,
-                       OptionTypeRepository optionTypeRepository) {
+                       OptionTypeRepository optionTypeRepository,
+                       StorageService storageService) {
         this.saleRepository = saleRepository;
         this.saleFileRepository = saleFileRepository;
         this.optionRepository = optionRepository;
         this.sellerRepository = sellerRepository;
         this.optionTypeRepository = optionTypeRepository;
+        this.storageService = storageService;
     }
 
     public Integer createSale(SaleRequestDto requestDto) {
@@ -82,4 +89,30 @@ public class SaleService {
 
         return savedSale.getId();
     }
+
+    // 판매글 ID로 user_id 조회
+    public Integer getUserIdBySaleId(Integer saleId) {
+        return saleRepository.findUserIdBySaleId(saleId);
+    }
+
+    public void deleteSale(Integer saleId) {
+        Sale sale = saleRepository.findById(saleId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 Sale ID입니다: " + saleId));
+
+        List<SaleFile> saleFiles = saleFileRepository.findBySale(sale);
+
+        //ObjectStorage의 파일 우선 제거
+        for(SaleFile saleFile:saleFiles){
+            storageService.delete("product/"+saleFile.getSaveFile());
+        }
+        //sale_file에 저장된 파일 정보 지우기
+        saleFileRepository.deleteAll(saleFiles);
+        //option에 저장된 정보 지우기
+        List<Options> options = optionRepository.findBySale(sale);
+        optionRepository.deleteAll(options);
+
+        //sale에 저장된 정보 지우기
+        saleRepository.delete(sale);
+    }
+
 }

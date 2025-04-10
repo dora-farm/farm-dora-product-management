@@ -2,6 +2,7 @@ package com.farmdora.farmdoraproductmanagement.product;
 
 import com.farmdora.farmdoraproductmanagement.common.response.HttpResponse;
 import com.farmdora.farmdoraproductmanagement.dto.SaleFileDto;
+import com.farmdora.farmdoraproductmanagement.dto.SaleIdsDto;
 import com.farmdora.farmdoraproductmanagement.dto.SaleRequestDto;
 import com.farmdora.farmdoraproductmanagement.service.SaleService;
 import com.farmdora.farmdoraproductmanagement.service.StorageService;
@@ -16,7 +17,7 @@ import java.util.UUID;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:5173") // 프론트와 테스트용 임시 추가
-@RequestMapping("/my/seller")
+@RequestMapping("/my/seller/item")
 public class SaleController {
 
     private final SaleService saleService;
@@ -27,7 +28,9 @@ public class SaleController {
         this.storageService = storageService;
     }
 
-    @PostMapping("additem")
+
+
+    @PostMapping("register")
     public HttpResponse addProduct(
             @RequestPart("productData") String productDataStr,
             @RequestPart("files") List<MultipartFile> files) throws IOException {
@@ -64,8 +67,34 @@ public class SaleController {
         return HttpResponse.builder()
                 .status(200)
                 .message("저장 성공")
-                .data("")
                 .build();
     }
+
+    @DeleteMapping("delete")
+    public HttpResponse deleteProduct(@RequestBody SaleIdsDto request){
+
+        List<Integer> saleIds = request.getSaleIds();
+        // saleId 중 제일 처음 값을 기준으로 sale->seller_id->seller(user_id) 조회
+        Integer user_id= saleService.getUserIdBySaleId(saleIds.get(0));
+
+//        if (user_id!= loginUser.getNo()) {
+//            return HttpResponse.builder()
+//                    .status()
+//                    .data("삭제 권한이 없습니다.")
+//                    .build();
+//        }
+
+        for (Integer saleId : saleIds) {
+            saleService.deleteSale(saleId);
+        }
+
+        //삭제 성공 시
+        return HttpResponse.builder()
+                .status(200)
+                .message("삭제 성공")
+                .build();
+    }
+
+
 
 }

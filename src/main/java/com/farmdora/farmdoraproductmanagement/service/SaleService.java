@@ -1,14 +1,14 @@
 package com.farmdora.farmdoraproductmanagement.service;
 
-import com.farmdora.farmdoraproductmanagement.dto.OptionDto;
-import com.farmdora.farmdoraproductmanagement.dto.SaleFileDto;
-import com.farmdora.farmdoraproductmanagement.dto.SaleRequestDto;
+import com.farmdora.farmdoraproductmanagement.dto.*;
 import com.farmdora.farmdoraproductmanagement.entity.*;
 import com.farmdora.farmdoraproductmanagement.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -115,4 +115,51 @@ public class SaleService {
         saleRepository.delete(sale);
     }
 
+    public SaleDetailDto getProductDetail(Integer productId) {
+        Sale sale = saleRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 Sale ID입니다: " + productId));
+
+        List<SaleFile> saleFiles = saleFileRepository.findBySale(sale);
+        List<Options> options = optionRepository.findBySale(sale);
+        List<OptionDto> optionDtos = new ArrayList<>();
+        String mainImage = null;
+        List<String> detailImages = new ArrayList<>();
+
+        for(SaleFile saleFile: saleFiles){
+            if(!saleFile.isMain()){
+                mainImage = storageService.getObjectStorageImageUrl(saleFile.getSaveFile());
+            }
+            else{
+                detailImages.add(storageService.getObjectStorageImageUrl(saleFile.getSaveFile()));
+            }
+        }
+
+        for (Options option : options) {
+            OptionDto optionDto = OptionDto.builder()
+                    .typeId(Integer.valueOf(option.getType().getId()))
+                    .name(option.getName())
+                    .price(option.getPrice())
+                    .quantity(option.getQuantity())
+                    .build();
+            optionDtos.add(optionDto);
+        }
+        Integer typeId = optionDtos.get(0).getTypeId();
+        OptionType optionType = optionTypeRepository.findByIdWithTypeBig(typeId).orElseThrow();
+        OptionTypeDto optionTypeDto = OptionTypeDto.from(optionType);
+
+        SaleDetailDto saleDetailDto = SaleDetailDto
+                .builder()
+                .id(sale.getId())
+                .title(sale.getTitle())
+                .content(sale.getContent())
+                .origin(sale.getOrigin())
+                .options(optionDtos)
+                .bigCategory(optionTypeDto.getTypeBigName())
+                .smallCategory(optionTypeDto.getTypeName())
+                .mainImage(mainImage)
+                .detailImages(detailImages)
+                .build();
+
+        return saleDetailDto;
+    }
 }

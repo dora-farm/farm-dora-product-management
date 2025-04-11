@@ -1,12 +1,14 @@
 package com.farmdora.farmdoraproductmanagement.product;
 
 import com.farmdora.farmdoraproductmanagement.common.response.HttpResponse;
+import com.farmdora.farmdoraproductmanagement.dto.SaleDetailDto;
 import com.farmdora.farmdoraproductmanagement.dto.SaleFileDto;
 import com.farmdora.farmdoraproductmanagement.dto.SaleIdsDto;
 import com.farmdora.farmdoraproductmanagement.dto.SaleRequestDto;
 import com.farmdora.farmdoraproductmanagement.service.SaleService;
 import com.farmdora.farmdoraproductmanagement.service.StorageService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.data.repository.query.Param;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,8 +29,6 @@ public class SaleController {
         this.saleService = saleService;
         this.storageService = storageService;
     }
-
-
 
     @PostMapping("register")
     public HttpResponse addProduct(
@@ -95,6 +95,17 @@ public class SaleController {
                 .build();
     }
 
+    @GetMapping("detail/{productId}")
+    public HttpResponse detailProduct(@PathVariable Integer productId){
+        System.out.println(productId);
+        SaleDetailDto saleDetailDto = saleService.getProductDetail(productId);
 
+        return HttpResponse
+                .builder()
+                .status(200)
+                .message("상세보기 성공")
+                .data(saleDetailDto)
+                .build();
+    }
 
 }

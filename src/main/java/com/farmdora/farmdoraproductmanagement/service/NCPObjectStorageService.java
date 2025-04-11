@@ -92,4 +92,12 @@ public class NCPObjectStorageService implements StorageService {
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public String getObjectStorageImageUrl(String objectName) {
+        // 실제 이미지 URL 생성 // ImageOptimizer 사용.
+        String path = "https://zcbg41sa9729.edge.naverncp.com/O8XfcLSSm6/product/";
+        String type = "?type=h&h=192&ttype=png";
+        return String.format("%s%s%s", path, objectName, type);
+    }
 }
